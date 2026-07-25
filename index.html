@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#203a31" />
-  <title>Valentina &amp; Mateo — Nuestra Boda</title>
+  <title>Jocelyn &amp; Jansen — Nuestra Boda</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@400;500;600;700&family=Parisienne&display=swap" rel="stylesheet" />
@@ -28,8 +28,8 @@
 <body>
   <div class="access-gate" id="access-gate" hidden><div class="access-box"><div class="kicker">Invitación personal</div><h2>Bienvenidos</h2><p>Ingresa el código que recibiste con tu invitación para confirmar tu asistencia.</p><form id="access-form"><input id="access-code" placeholder="Código de invitación" autocomplete="off" required><button class="button" type="submit">Ver mi invitación</button></form><p class="access-error" id="access-error" aria-live="polite"></p></div></div>
   <header class="hero" id="inicio">
-    <div class="topbar"><a class="brand" href="#inicio">V &amp; M</a><nav><a href="#historia">Nosotros</a><a href="#galeria">Galería</a><a href="#detalles">Detalles</a><a href="#rsvp">Confirmar</a></nav></div>
-    <div class="hero-content"><div class="eyebrow">Tenemos algo que celebrar</div><h1>Valentina <i>&amp;</i> Mateo</h1><div class="hero-date">14 de noviembre · 2026</div></div>
+    <div class="topbar"><a class="brand" href="#inicio">J &amp; J</a><nav><a href="#historia">Nosotros</a><a href="#galeria">Galería</a><a href="#detalles">Detalles</a><a href="#rsvp">Confirmar</a></nav></div>
+    <div class="hero-content"><div class="eyebrow">Tenemos algo que celebrar</div><h1>Jocelyn <i>&amp;</i> Jansen</h1><div class="hero-date">19 de diciembre · 2026</div></div>
     <a class="scroll-hint" href="#historia">Descubre nuestra historia</a>
   </header>
 
@@ -50,10 +50,10 @@
 
     <section class="section rsvp" id="rsvp"><div class="kicker">Antes del 15 de octubre</div><h2 class="heading">Confirma tu asistencia</h2><div class="script">nos encantará celebrar contigo</div><p class="invite-welcome" id="invite-welcome"></p><form id="rsvp-form" hidden><select name="asistencia" id="attendance" required><option value="" disabled selected>¿Nos acompañas?</option><option value="si">¡Sí, ahí estaré!</option><option value="no">No podré asistir</option></select><div id="guest-area" hidden><p class="guest-title" id="guest-title"></p><div class="guest-fields" id="guest-fields"></div></div><textarea name="mensaje" placeholder="Déjanos un mensaje para los novios (opcional)"></textarea><button class="button" id="rsvp-submit" type="submit">Confirmar asistencia</button></form><p class="rsvp-message" id="rsvp-message" aria-live="polite"></p><p class="rsvp-note">Tu respuesta se guardará de forma segura al confirmar.</p></section>
   </main>
-  <footer><div class="monogram">V &amp; M</div><p>Gracias por ser parte de nuestra historia</p><small>14 · 11 · 2026 &nbsp; — &nbsp; Querétaro, México</small></footer>
+  <footer><div class="monogram">J &amp; J</div><p>Gracias por ser parte de nuestra historia</p><small>19 · 12 · 2026 &nbsp; — &nbsp; Querétaro, México</small></footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const weddingDate = new Date('2026-11-14T17:30:00-06:00').getTime();
+    const weddingDate = new Date('2026-12-19T17:30:00-06:00').getTime();
     const updateCountdown = () => { let diff = Math.max(0, weddingDate - Date.now()); const values = [Math.floor(diff/864e5), Math.floor(diff/36e5)%24, Math.floor(diff/6e4)%60, Math.floor(diff/1e3)%60]; ['days','hours','minutes','seconds'].forEach((id,i)=>document.getElementById(id).textContent=String(values[i]).padStart(2,'0')); }; updateCountdown(); setInterval(updateCountdown,1000);
     const slides=document.getElementById('slides'), dots=[...document.querySelectorAll('.dot')]; let current=0, timer; function show(n){current=(n+3)%3;slides.style.transform=`translateX(-${current*100}%)`;dots.forEach((dot,i)=>dot.classList.toggle('active',i===current));} function play(){clearInterval(timer);timer=setInterval(()=>show(current+1),5000)} document.querySelector('.next').onclick=()=>{show(current+1);play()};document.querySelector('.prev').onclick=()=>{show(current-1);play()};dots.forEach((dot,i)=>dot.onclick=()=>{show(i);play()});play();
     const SUPABASE_URL = 'https://txfptdebzffaayqbchbo.supabase.co';
