@@ -65,9 +65,9 @@
         try{
           const response=await fetch('img/Invitacion_Jocelyn_Jansen_SinInvitados.pdf');
           if(!response.ok)throw new Error('No se encontro la plantilla PDF.');
-          const {PDFDocument,PDFName,PDFString,PDFArray,PDFDict,StandardFonts,rgb}=window.PDFLib;
+          const {PDFDocument,PDFName,PDFString,PDFArray,PDFDict,rgb}=window.PDFLib;
           const pdf=await PDFDocument.load(await response.arrayBuffer());
-          const page=pdf.getPage(0),numberFont=await pdf.embedFont(StandardFonts.TimesRoman),detailFont=await pdf.embedFont(StandardFonts.TimesItalic);
+          const page=pdf.getPage(0),numberFont=await pdf.embedFont('Times-Roman'),detailFont=await pdf.embedFont('Times-Italic');
           const number=String(passes),label=`Pase${passes===1?'':'s'} reservado${passes===1?'':'s'} para ustedes`;
           page.drawText(number,{x:(page.getWidth()-numberFont.widthOfTextAtSize(number,42))/2,y:425,size:42,font:numberFont,color:rgb(.10,.10,.10)});
           page.drawText(label,{x:(page.getWidth()-detailFont.widthOfTextAtSize(label,14))/2,y:397,size:14,font:detailFont,color:rgb(.18,.18,.18)});
