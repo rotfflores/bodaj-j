@@ -6,8 +6,10 @@
   <meta name="theme-color" content="#111111">
   <title>Panel privado · Jocelyn & Jansen</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <style>
     :root{--ink:#111;--paper:#fafafa;--muted:#696969;--line:#dedede}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px Montserrat,Arial,sans-serif}.wrap{width:min(1100px,calc(100% - 34px));margin:0 auto;padding:48px 0 70px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}h1{font:500 clamp(40px,7vw,68px)/.95 Georgia,serif;margin:10px 0 8px}p{color:var(--muted);line-height:1.55}.login{width:min(420px,100%);margin:9vh auto;background:#fff;border:1px solid var(--line);padding:34px;box-shadow:0 16px 40px rgba(0,0,0,.06)}label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin:18px 0 7px}input{width:100%;min-height:46px;border:1px solid #c8c8c8;padding:10px 12px;font:inherit}button{min-height:45px;padding:0 18px;border:1px solid #111;background:#111;color:#fff;font:600 10px Montserrat,Arial,sans-serif;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer}button.secondary{background:#fff;color:#111}.login button{width:100%;margin-top:22px}.error{min-height:20px;margin-top:14px;color:#9f3028;font-size:12px}.head{display:flex;gap:24px;align-items:end;justify-content:space-between;margin-bottom:28px}.head button{flex:none}.create{background:#fff;border:1px solid var(--line);padding:24px;margin:0 0 28px}.create h2{font:500 29px Georgia,serif;margin:0}.create form{display:grid;grid-template-columns:1fr 150px auto;gap:10px;align-items:end}.create label{margin:0 0 7px}.create button{margin:0}.created{margin:14px 0 0;color:#176b3a;word-break:break-all}.created a{color:inherit;font-weight:700}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:28px 0}.stat{background:#fff;border:1px solid var(--line);padding:20px}.stat b{display:block;font:500 43px/1 Georgia,serif}.stat span{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line)}table{border-collapse:collapse;width:100%;min-width:810px}th,td{text-align:left;padding:16px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:#f7f7f7}td{font-size:13px;line-height:1.45}.yes{color:#176b3a;font-weight:700}.no{color:#9f3028;font-weight:700}.empty{text-align:center;padding:45px;color:var(--muted)}.updated{font-size:11px;color:var(--muted);margin-top:14px}@media(max-width:650px){.wrap{padding-top:32px}.head{align-items:start;flex-direction:column;gap:14px}.summary{grid-template-columns:1fr}.head button{width:100%}.create form{grid-template-columns:1fr}.create button{width:100%}}
+    .created button{display:block;margin-top:12px}
   </style>
 </head>
 <body>
@@ -50,6 +52,52 @@
     document.getElementById('create-form').addEventListener('submit',async event=>{event.preventDefault();const name=document.getElementById('invite-name').value.trim(),passes=Number(document.getElementById('invite-passes').value),output=document.getElementById('created-link');output.textContent='Creando invitación…';const {data,error}=await client.rpc('crear_invitacion_cliente',{p_titular:name,p_pases:passes});if(error||!data?.length){output.textContent='No fue posible crear la invitación.';return;}const invite=data[0],url=`${location.origin}${location.pathname.replace(/admin\.html$/,'')}?invitacion=${encodeURIComponent(invite.codigo)}`;output.innerHTML=`Invitación creada: <a href="${url}" target="_blank" rel="noopener">${url}</a>`;event.target.reset();document.getElementById('invite-passes').value=2;});
     document.getElementById('logout').addEventListener('click',async()=>{await client.auth.signOut();dashboardView.hidden=true;loginView.hidden=false;});
     client.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'&&session)showRecovery();});client.auth.getSession().then(({data:{session}})=>{if(!session)return;if(location.hash.includes('type=recovery'))showRecovery();else showDashboard();});setInterval(()=>{if(!dashboardView.hidden)loadRows();},15000);
+  </script>
+  <script>
+    (()=>{
+      const legacyForm=document.getElementById('create-form');
+      const createForm=legacyForm.cloneNode(true);
+      legacyForm.replaceWith(createForm);
+
+      const downloadPersonalizedPdf=async({name,passes,url},button)=>{
+        const originalLabel=button.textContent;
+        button.disabled=true;button.textContent='Preparando PDF...';
+        try{
+          const response=await fetch('img/Invitacion_Jocelyn_Jansen_SinInvitados.pdf');
+          if(!response.ok)throw new Error('No se encontro la plantilla PDF.');
+          const {PDFDocument,PDFName,PDFString,PDFArray,PDFDict,StandardFonts,rgb}=window.PDFLib;
+          const pdf=await PDFDocument.load(await response.arrayBuffer());
+          const page=pdf.getPage(0),font=await pdf.embedFont(StandardFonts.TimesRoman);
+          const label=`${passes} pase${passes===1?'':'s'} reservado${passes===1?'':'s'} para ustedes`;
+          page.drawText(label,{x:(page.getWidth()-font.widthOfTextAtSize(label,16))/2,y:415,size:16,font,color:rgb(.12,.12,.12)});
+          const annotations=page.node.lookupMaybe(PDFName.of('Annots'),PDFArray);
+          if(annotations)for(let index=0;index<annotations.size();index++){
+            const annotation=pdf.context.lookup(annotations.get(index),PDFDict);
+            if(annotation?.get(PDFName.of('Subtype'))?.toString()==='/Link'){
+              const action=annotation.lookupMaybe(PDFName.of('A'),PDFDict);
+              if(action)action.set(PDFName.of('URI'),PDFString.of(url));
+            }
+          }
+          const safeName=name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/(^-|-$)/g,'')||'invitacion';
+          const blob=new Blob([await pdf.save()],{type:'application/pdf'}),downloadUrl=URL.createObjectURL(blob),link=document.createElement('a');
+          link.href=downloadUrl;link.download=`Invitacion-Jocelyn-Jansen-${safeName}.pdf`;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(downloadUrl);
+        }catch(error){console.error('PDF personalizado:',error);alert('No fue posible preparar el PDF. Intenta de nuevo.');}
+        finally{button.disabled=false;button.textContent=originalLabel;}
+      };
+
+      createForm.addEventListener('submit',async event=>{
+        event.preventDefault();
+        const name=document.getElementById('invite-name').value.trim(),passes=Number(document.getElementById('invite-passes').value),output=document.getElementById('created-link');
+        output.textContent='Creando invitacion...';
+        const {data,error}=await client.rpc('crear_invitacion_cliente',{p_titular:name,p_pases:passes});
+        if(error||!data?.length){output.textContent='No fue posible crear la invitacion.';return;}
+        const invite=data[0],url=`${location.origin}${location.pathname.replace(/admin\.html$/,'')}?invitacion=${encodeURIComponent(invite.codigo)}`;
+        output.innerHTML=`Invitacion creada: <a href="${url}" target="_blank" rel="noopener">${url}</a><button id="download-invitation-pdf" type="button">Descargar PDF personalizado</button>`;
+        const downloadButton=document.getElementById('download-invitation-pdf');
+        downloadButton.addEventListener('click',()=>downloadPersonalizedPdf({name,passes,url},downloadButton));
+        event.target.reset();document.getElementById('invite-passes').value=2;
+      });
+    })();
   </script>
 </body>
 </html>
