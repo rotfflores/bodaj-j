@@ -55,6 +55,7 @@
   </script>
   <script>
     (()=>{
+      document.getElementById('send-recovery')?.remove();
       const legacyForm=document.getElementById('create-form');
       const createForm=legacyForm.cloneNode(true);
       legacyForm.replaceWith(createForm);
