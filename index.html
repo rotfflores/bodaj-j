@@ -105,7 +105,7 @@
     const SUPABASE_URL = 'https://txfptdebzffaayqbchbo.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_yD1UihDwbojZkTRkqVvP4g_OBsEdF_p';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-    const INVITATION_BACKUP=Object.freeze({'INV-AC5B79B0':Object.freeze({codigo:'INV-AC5B79B0',titular:'Familia Flores',pases:4,confirmado:true,asistencia:true,mensaje:'Viva los noviooooos! Por cierto que bonita pagina'})});
+    const INVITATION_BACKUP=Object.freeze({'INV-AC5B79B0':Object.freeze({codigo:'INV-AC5B79B0',titular:'Torres Flores',pases:5,confirmado:true,asistencia:true,mensaje:'Viva los noviooooos! Por cierto que bonita pagina'})});
     const EMAILJS_SERVICE_ID='service_68nzksa',EMAILJS_TEMPLATE_ID='template_t3laofh',EMAILJS_PUBLIC_KEY='JRZSA4R7lItxN3CsW';
     window.emailjs?.init({publicKey:EMAILJS_PUBLIC_KEY});
     const sendConfirmationEmail=({attending,names,message})=>{if(!window.emailjs)throw new Error('No se pudo cargar el servicio de correo.');return window.emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{invitacion:invitation.titular,codigo:invitation.codigo,asistencia:attending?'Sí, asistirán':'No podrán asistir',nombres:names.length?names.join(', '):'—',mensaje:message||'—'});};
